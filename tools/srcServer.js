@@ -10,7 +10,7 @@ const port = 3000;
 const app = express();
 const compiler = webpack(config);
 
-var webpackMiddleware = require("webpack-dev-middleware");
+let webpackMiddleware = require("webpack-dev-middleware");
 
 app.use(
 	webpackMiddleware(
