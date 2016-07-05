@@ -58,15 +58,45 @@ export default class MapPage extends MapControl  {
       showModal : false,
       value: '',
       suggestions: getSuggestions(''),
-      coord: [51.505, -0.09]
+      coord: [51.505, -0.09],
+      isLoading: false
     }
     this.open = this.open.bind(this);
     this.close = this.close.bind(this);
     this.onChange = this.onChange.bind(this);
     this.onSuggestionsUpdateRequested = this.onSuggestionsUpdateRequested.bind(this);
     this.onSuggestionSelected = this.onSuggestionSelected.bind(this);
+    this.loadSuggestions = this.loadSuggestions.bind(this);
   }
 
+  loadSuggestions(value) {
+
+    this.setState({
+      isLoading: true
+    });
+    let self = this;
+    $.get('http://localhost:8080/api/address_autocomplete/' + value, function(res){
+      let suggestions = [];
+      for(var i=0; i< res.length; i++) {
+        suggestions.push({
+          name: res[i].EZI_Address,
+          coord: [res[i].lat, res[i].long]
+        });
+      }
+      if (value === self.state.value) {
+        self.setState({
+          isLoading: false,
+          suggestions
+        });
+      } else { // Ignore suggestions if input value changed
+        self.setState({
+          isLoading: false
+        });
+      }
+
+    });
+
+  }
 
   onChange(event, { newValue }) {
     this.setState({
@@ -75,9 +105,7 @@ export default class MapPage extends MapControl  {
   }
 
   onSuggestionsUpdateRequested({ value }) {
-    this.setState({
-      suggestions: getSuggestions(value)
-    });
+    this.loadSuggestions(value); 
   }
 
   onSuggestionSelected(event, { suggestion, suggestionValue, sectionIndex, method }){
