@@ -3,10 +3,10 @@ import ReactDOM from 'react-dom';
 import L from 'leaflet';
 import { MapControl } from 'react-leaflet';
 
-export default class SearchMap extends MapControl {
+export default class CustomControl extends MapControl {
 
 	componentWillMount() {
-		const legend = L.control({position: 'topleft'});
+		const legend = L.control({position: this.props.position});
 		const jsx = (
 			<div {...this.props}>
 				{this.props.children}
@@ -14,7 +14,7 @@ export default class SearchMap extends MapControl {
 		);
 
 		legend.onAdd = function (map) {
-			let div = L.DomUtil.create('div', '');
+			let div = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
 			ReactDOM.render(jsx, div);
 			return div;
 		};
