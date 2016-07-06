@@ -1,156 +1,42 @@
 import React from 'react';
 import { render } from 'react-dom';
-import L from 'leaflet';
 import { Map, MapControl, Marker, Popup, TileLayer, LayersControl,LayerGroup, Circle,FeatureGroup, Rectangle } from 'react-leaflet';
-const { BaseLayer, Overlay } = LayersControl;
 import CustomControl from '../search/CustomControl';
 import ModalControl from '../search/ModalControl';
 import SearchControl from '../search/SearchControl';
+import { Button } from 'react-bootstrap';
 
-import 'leaflet/dist/leaflet.css';
-import { Button, Modal } from 'react-bootstrap';
-import 'jquery-ui/themes/smoothness/jquery-ui.css';
-import '../../styles/style.css';
-
-
-
-import Autosuggest from 'react-autosuggest';
-
-const languages = [
-  {
-    name: '25 lucknow street, Mitcham',
-    coord: [47.505, -0.09]
-  },
-  {
-    name: '29 lucknow street, Mitcham',
-    coord: [37.78, -0.09]
-  }
-];
-
-function escapeRegexCharacters(str) {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-function getSuggestions(value) {
-  const escapedValue = escapeRegexCharacters(value.trim());
-  if (escapedValue === '') {return [];}
-  const regex = new RegExp('^' + escapedValue, 'i');
-  return languages.filter(language => regex.test(language.name));
-}
-
-function getSuggestionValue(suggestion) {
-  return suggestion.name;
-}
-
-function renderSuggestion(suggestion) {
-  return (
-    <span>{suggestion.name}</span>
-  );
-}
-
-
-
-
-export default class MapPage extends MapControl  {
+class MapPage extends MapControl  {
 
   constructor(){
     super();
-    this.state = {
-      showModal : false,
-      value: '',
-      suggestions: getSuggestions(''),
-      coord: [51.505, -0.09],
-      isLoading: false
-    }
+    this.state = {showModal : false, info: 'London', coord: [51.505, -0.09] }
     this.open = this.open.bind(this);
-    this.close = this.close.bind(this);
-    this.onChange = this.onChange.bind(this);
-    this.onSuggestionsUpdateRequested = this.onSuggestionsUpdateRequested.bind(this);
-    this.onSuggestionSelected = this.onSuggestionSelected.bind(this);
-    this.loadSuggestions = this.loadSuggestions.bind(this);
+    this.onSelect = this.onSelect.bind(this);
   }
 
-  loadSuggestions(value) {
-
-    this.setState({
-      isLoading: true
-    });
-    let self = this;
-    $.get('http://localhost:8080/api/address_autocomplete/' + value, function(res){
-      let suggestions = [];
-      for(var i=0; i< res.length; i++) {
-        suggestions.push({
-          name: res[i].EZI_Address,
-          coord: [res[i].lat, res[i].long]
-        });
-      }
-      if (value === self.state.value) {
-        self.setState({
-          isLoading: false,
-          suggestions
-        });
-      } else { // Ignore suggestions if input value changed
-        self.setState({
-          isLoading: false
-        });
-      }
-
-    });
-
-  }
-
-  onChange(event, { newValue }) {
-    this.setState({
-      value: newValue
-    });
-  }
-
-  onSuggestionsUpdateRequested({ value }) {
-    this.loadSuggestions(value);
-  }
-
-  onSuggestionSelected(event, { suggestion, suggestionValue, sectionIndex, method }){
-    this.setState({
-      coord: suggestion.coord
-    });
-    this.close();
-  }
-
-	componentWillMount() {
-
-	}
-
-	componentDidMount(){
-
-	}
+  componentDidMount(){}
 
   open() {
     this.setState({ showModal: true });
   }
 
-  close(){
-    this.setState({showModal: false});
+  onSelect(suggestion){
+    this.setState({ showModal: false, info: suggestion.name, coord: suggestion.coord });
   }
 
 	render(){
 		const center = this.state.coord;
-
 		return(
-
       <div>
-
         <ModalControl showModal={this.state.showModal}>
-          <SearchControl></SearchControl>
+          <SearchControl onSelect={this.onSelect}></SearchControl>
         </ModalControl>
-
         <Map center={center} zoom={13}>
-          <TileLayer
-            attribution='&copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
-          />
+          <TileLayer attribution='&copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors' url='http://{s}.tile.osm.org/{z}/{x}/{y}.png' />
           <Marker position={center}>
             <Popup>
-              <span>A pretty CSS3 popup. <br/> Easily customizable.</span>
+              <span>{this.state.info}</span>
             </Popup>
           </Marker>
           <CustomControl className="supportLegend tab" position="topleft">
@@ -158,9 +44,9 @@ export default class MapPage extends MapControl  {
           </CustomControl>
         </Map>
       </div>
-
 		);
 	}
 }
 
+export default MapPage;
 

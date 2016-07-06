@@ -23,14 +23,17 @@ export default class SearchControl extends React.Component {
       isLoading: false
     }
     this.onChange = this.onChange.bind(this);
+    this.onSelect = this.onSelect.bind(this);
     this.onSuggestionsUpdateRequested = this.onSuggestionsUpdateRequested.bind(this);
     this.onSuggestionSelected = this.onSuggestionSelected.bind(this);
     this.loadSuggestions = this.loadSuggestions.bind(this);
   }
 
+  onSelect(info){
+    this.props.onSelect(info);
+  }
 
   loadSuggestions(value) {
-
     this.setState({
       isLoading: true
     });
@@ -69,10 +72,7 @@ export default class SearchControl extends React.Component {
   }
 
   onSuggestionSelected(event, { suggestion, suggestionValue, sectionIndex, method }){
-    this.setState({
-      coord: suggestion.coord
-    });
-    this.close();
+    this.onSelect(suggestion);
   }
 
   render(){
