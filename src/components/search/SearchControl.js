@@ -2,6 +2,7 @@ import React from 'react';
 import Autosuggest from 'react-autosuggest';
 import $ from 'jquery';
 import 'jquery-ui';
+import {Tab, Row, Col, Nav, NavItem} from 'react-bootstrap';
 
 function getSuggestionValue(suggestion) {
   return suggestion.name;
@@ -77,19 +78,55 @@ export default class SearchControl extends React.Component {
 
   render(){
     const { value, suggestions } = this.state;
-    const inputProps = {
-      placeholder: 'Type \'c\'',
+    const inputPropsAddress = {
+      placeholder: 'Type address',
+      value,
+      onChange: this.onChange
+    };
+    const inputPropsSlid = {
+      placeholder: 'Type SLID',
       value,
       onChange: this.onChange
     };
     return(
-      <Autosuggest suggestions={suggestions}
-                   onSuggestionsUpdateRequested={this.onSuggestionsUpdateRequested}
-                   getSuggestionValue={getSuggestionValue}
-                   renderSuggestion={renderSuggestion}
-                   inputProps={inputProps}
-                   onSuggestionSelected={this.onSuggestionSelected}
-      />
+
+      <Tab.Container id="left-tabs-example" defaultActiveKey="first">
+        <Row className="clearfix">
+          <Col sm={4}>
+            <Nav bsStyle="pills" stacked>
+              <NavItem eventKey="first">
+                Search by address
+              </NavItem>
+              <NavItem eventKey="second">
+                Search by SLID
+              </NavItem>
+            </Nav>
+          </Col>
+          <Col sm={8}>
+            <Tab.Content animation>
+              <Tab.Pane eventKey="first">
+                <Autosuggest suggestions={suggestions}
+                             onSuggestionsUpdateRequested={this.onSuggestionsUpdateRequested}
+                             getSuggestionValue={getSuggestionValue}
+                             renderSuggestion={renderSuggestion}
+                             inputProps={inputPropsAddress}
+                             onSuggestionSelected={this.onSuggestionSelected}
+                />
+              </Tab.Pane>
+              <Tab.Pane eventKey="second">
+                <Autosuggest suggestions={suggestions}
+                             onSuggestionsUpdateRequested={this.onSuggestionsUpdateRequested}
+                             getSuggestionValue={getSuggestionValue}
+                             renderSuggestion={renderSuggestion}
+                             inputProps={inputPropsSlid}
+                             onSuggestionSelected={this.onSuggestionSelected}
+                />
+              </Tab.Pane>
+            </Tab.Content>
+          </Col>
+        </Row>
+      </Tab.Container>
+
     )
   }
 }
