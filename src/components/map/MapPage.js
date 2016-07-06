@@ -4,8 +4,9 @@ import L from 'leaflet';
 import { Map, MapControl, Marker, Popup, TileLayer, LayersControl,LayerGroup, Circle,FeatureGroup, Rectangle } from 'react-leaflet';
 const { BaseLayer, Overlay } = LayersControl;
 import CustomControl from '../search/CustomControl';
-import $ from 'jquery';
-import 'jquery-ui';
+import ModalControl from '../search/ModalControl';
+import SearchControl from '../search/SearchControl';
+
 import 'leaflet/dist/leaflet.css';
 import { Button, Modal } from 'react-bootstrap';
 import 'jquery-ui/themes/smoothness/jquery-ui.css';
@@ -105,7 +106,7 @@ export default class MapPage extends MapControl  {
   }
 
   onSuggestionsUpdateRequested({ value }) {
-    this.loadSuggestions(value); 
+    this.loadSuggestions(value);
   }
 
   onSuggestionSelected(event, { suggestion, suggestionValue, sectionIndex, method }){
@@ -133,35 +134,14 @@ export default class MapPage extends MapControl  {
 
 	render(){
 		const center = this.state.coord;
-    const position = {};
-    const { value, suggestions } = this.state;
-    const inputProps = {
-      placeholder: 'Type \'c\'',
-      value,
-      onChange: this.onChange
-    };
 
 		return(
 
       <div>
-        <Modal show={this.state.showModal} onHide={this.close} className='ui-front'>
-          <Modal.Header closeButton>
-            <Modal.Title>Search</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Autosuggest suggestions={suggestions}
-                         onSuggestionsUpdateRequested={this.onSuggestionsUpdateRequested}
-                         getSuggestionValue={getSuggestionValue}
-                         renderSuggestion={renderSuggestion}
-                         inputProps={inputProps}
-                         onSuggestionSelected={this.onSuggestionSelected}
-            />
 
-          </Modal.Body>
-          <Modal.Footer>
-            <Button onClick={this.close}>Close</Button>
-          </Modal.Footer>
-        </Modal>
+        <ModalControl showModal={this.state.showModal}>
+          <SearchControl></SearchControl>
+        </ModalControl>
 
         <Map center={center} zoom={13}>
           <TileLayer
