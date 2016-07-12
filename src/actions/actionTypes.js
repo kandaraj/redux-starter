@@ -1,1 +1,1 @@
-export const CREATE_COURSE = 'CREATE_COURSE';
+export const MAP_PINNED = 'MAP_PINNED';

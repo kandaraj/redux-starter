@@ -1,17 +1,20 @@
 import React from 'react';
 import { render } from 'react-dom';
-import { Map, MapControl, Marker, Popup, TileLayer, LayersControl,LayerGroup, Circle,FeatureGroup, Rectangle } from 'react-leaflet';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { Map, MapControl, Marker, Popup, TileLayer } from 'react-leaflet';
 import CustomControl from '../search/CustomControl';
 import ModalControl from '../search/ModalControl';
 import SearchControl from '../search/SearchControl';
+import SearchHistory from '../search/SearchHistory';
 import { Button } from 'react-bootstrap';
-import FontAwesome from 'react-fontawesome';
+import * as MapAction from '../../actions/mapActions';
 
 class MapPage extends MapControl  {
 
   constructor(){
     super();
-    this.state = {showModal : false, info: 'London', coord: [51.505, -0.09] }
+    this.state = {showModal : false }
     this.open = this.open.bind(this);
     this.onSelect = this.onSelect.bind(this);
   }
@@ -23,11 +26,12 @@ class MapPage extends MapControl  {
   }
 
   onSelect(suggestion){
-    this.setState({ showModal: false, info: suggestion.name, coord: suggestion.coord });
+    this.setState({ showModal: false} );
+    this.props.actions.mapPinned({info: suggestion.name, coord: suggestion.coord});
   }
 
 	render(){
-		const center = this.state.coord;
+		const center = this.props.geoLocation.coord;
 		return(
       <div>
         <ModalControl showModal={this.state.showModal}>
@@ -44,10 +48,28 @@ class MapPage extends MapControl  {
             <Button bsStyle="warning" onClick={this.open}>Search</Button>
           </CustomControl>
         </Map>
+        <div>
+          <SearchHistory geoLocation={this.props.geoLocation}/>
+        </div>
       </div>
 		);
 	}
 }
 
-export default MapPage;
+const mapStateToProps = function(state, ownProps){
+  "use strict";
+
+  return {
+    geoLocation: state.maps.geoLocation
+  };
+};
+
+const mapDispatchToProps = function(dispatch){
+  "use strict";
+  return {
+    actions: bindActionCreators(MapAction, dispatch)
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(MapPage);
 
